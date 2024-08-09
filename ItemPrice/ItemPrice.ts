@@ -63,7 +63,7 @@ export function loadItemPriceMod(MR2: MR2Globals) {
         }
         return price;
       }
-      return defaultPrice.call(item, state, params);
+      return defaultPrice.call(this, state, params);
     }
   }
 }
