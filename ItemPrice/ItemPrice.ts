@@ -1,6 +1,6 @@
 import { MR2Globals } from "magic-research-2-modding-sdk";
 import { GameState } from "magic-research-2-modding-sdk/modding-decs/backend/GameState";
-import { Item, ItemParams } from "magic-research-2-modding-sdk/modding-decs/backend/items/Item";
+import { ItemParams } from "magic-research-2-modding-sdk/modding-decs/backend/items/Item";
 import { Resource } from "magic-research-2-modding-sdk/modding-decs/backend/Resources";
 
 const itemPriceConfig = {
@@ -20,10 +20,6 @@ const itemPriceConfig = {
   "Coins": 1.0,
   "Monstium": 1.0,
   "TimePiece": 10.0
-}
-
-export function getGameItemById(MR2: MR2Globals, id: string): Item {
-  return MR2.Items.getById(id);
 }
 
 function getResourceValue(key: string): number {
@@ -53,7 +49,7 @@ export function loadItemPriceMod(MR2: MR2Globals) {
         }
   
         for (const [itemID, amount] of Object.entries(items)) {
-          const item = getGameItemById(MR2, itemID);
+          const item = MR2.Items.getById(itemID);
           if (item) {
             const itemPrice = item.getBaseSalePrice(state, item.getDefaultParams());
             price += (amount || 0) * itemPrice;
