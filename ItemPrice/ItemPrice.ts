@@ -3,8 +3,38 @@ import { GameState } from "magic-research-2-modding-sdk/modding-decs/backend/Gam
 import { Item, ItemParams } from "magic-research-2-modding-sdk/modding-decs/backend/items/Item";
 import { Resource } from "magic-research-2-modding-sdk/modding-decs/backend/Resources";
 
+const itemPriceConfig = {
+  "Mana": 0,
+  "FireEssence": 0.035,
+  "EarthEssence": 0.035,
+  "WaterEssence": 0.035,
+  "AirEssence": 0.035,
+  "PoisonEssence": 0.055,
+  "MindEssence": 0.075,
+  "LifeEssence": 0.075,
+  "ElectricEssence": 0.1,
+  "DeathEssence": 0.1,
+  "HolyEssence": 0.1,
+  "TimeEssence": 0.2,
+  "SpaceEssence": 0.2,
+  "Coins": 1.0,
+  "Monstium": 1.0,
+  "TimePiece": 10.0
+}
+
 export function getGameItemById(MR2: MR2Globals, id: string): Item {
   return MR2.Items.getById(id);
+}
+
+function getResourceValue(key: string): number {
+  if (itemPriceConfig && itemPriceConfig[key] !== undefined) {
+    const value = itemPriceConfig[key];
+    if (typeof value === "number")
+    {
+      return itemPriceConfig[key];
+    }
+  }
+  return 1;
 }
 
 export function loadItemPriceMod(MR2: MR2Globals) {
@@ -19,40 +49,7 @@ export function loadItemPriceMod(MR2: MR2Globals) {
           
         for (const [resource, amount] of Object.entries(resources)) {
           const resourceType = resource as Resource;
-          let increment = 1;
-          switch (resourceType) {
-            case MR2.Resource.Mana:
-              increment = 0;
-              break;
-            case MR2.Resource.TimePiece:
-              increment = 5;
-              break;
-            case MR2.Resource.AirEssence:
-            case MR2.Resource.EarthEssence:
-            case MR2.Resource.WaterEssence:
-            case MR2.Resource.FireEssence:
-              increment = 0.05;
-              break;
-            case MR2.Resource.PoisonEssence:
-              increment = 0.1;
-            case MR2.Resource.MindEssence:
-            case MR2.Resource.LifeEssence:
-              increment = 0.15;
-              break;
-            case MR2.Resource.ElectricEssence:
-            case MR2.Resource.DeathEssence:
-              increment = 0.25;
-              break;
-            case MR2.Resource.HolyEssence:
-            case MR2.Resource.SpaceEssence:
-            case MR2.Resource.TimeEssence:
-              increment = 0.5;
-              break;
-            default:
-              increment = 1;
-              break;
-          }
-          price += (amount || 0) * increment;
+          price += (amount || 0) * getResourceValue(resourceType.toString());
         }
   
         for (const [itemID, amount] of Object.entries(items)) {
