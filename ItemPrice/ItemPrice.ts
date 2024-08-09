@@ -1,7 +1,6 @@
 import { MR2Globals } from "magic-research-2-modding-sdk";
 import { GameState } from "magic-research-2-modding-sdk/modding-decs/backend/GameState";
 import { ItemParams } from "magic-research-2-modding-sdk/modding-decs/backend/items/Item";
-import { Resource } from "magic-research-2-modding-sdk/modding-decs/backend/Resources";
 
 const itemPriceConfig = {
   "Mana": 0,
@@ -34,30 +33,37 @@ function getResourceValue(key: string): number {
 }
 
 export function loadItemPriceMod(MR2: MR2Globals) {
-  const items = MR2.Items.getAll();
-  for (const item of items) {
+  const itemList = MR2.Items.getAll();
+  for (const item of itemList) {
+    if (item === undefined) {
+      return 0;
+    }
+
     const defaultPrice = item.getBaseSalePrice;
     item.getBaseSalePrice = function (state: GameState, params: ItemParams): number {
       const transmutationSpell = MR2.getTransmutationSpellForItem(this);
-      if (transmutationSpell) {
+      if (transmutationSpell !== undefined) {
         let price = 0;
         const { resources, items } = transmutationSpell.getCraftingMaterials(state);
           
         for (const [resource, amount] of Object.entries(resources)) {
-          const resourceType = resource as Resource;
-          price += (amount || 0) * getResourceValue(resourceType.toString());
+          if (resource !== undefined) {
+            price += (amount || 0) * getResourceValue(resource);
+          }
         }
   
         for (const [itemID, amount] of Object.entries(items)) {
-          const item = MR2.Items.getById(itemID);
-          if (item) {
-            const itemPrice = item.getBaseSalePrice(state, item.getDefaultParams());
-            price += (amount || 0) * itemPrice;
+          if (itemID !== undefined) {
+            const itemRef = MR2.Items.getById(itemID);
+            if (itemRef !== undefined) {
+              const itemPrice = itemRef.getBaseSalePrice(state, itemRef.getDefaultParams());
+              price += (amount || 0) * itemPrice;
+            }
           }
         }
         return price;
       }
-      return defaultPrice.call(this, state, params);
+      return defaultPrice.call(item, state, params);
     }
   }
 }
