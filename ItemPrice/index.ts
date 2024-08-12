@@ -14,7 +14,7 @@ const {
   name,
   version,
   description,
-} = require("./ItemPriceMod");
+} = require("./ItemPrice");
 
 export { description, id, load, name, preload, version };
 
