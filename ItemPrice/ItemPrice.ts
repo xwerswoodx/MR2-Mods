@@ -46,14 +46,15 @@ export function load(MR2: MR2Globals) {
           if (buffSpell.isActive(state))
           {
             let effect = buffSpell.getActionEffect(state, "magnitude");
-            spellBonus = Math.round(Math.exp(1 - (1 / (effect + 1))));
+            spellBonus = 100 * (1 - (1 / (effect + 1)));
+            spellBonus = Math.round(spellBonus);
           }
         }
 
           
         for (const [resource, amount] of Object.entries(resources)) {
           if (resource !== undefined) {
-            const newAmount = amount + (amount * spellBonus);
+            const newAmount = amount + (amount * spellBonus / 100);
             price += (newAmount || 0) * getResourceValue(resource);
             price += (newAmount || 0) / 2500; //Bonus price per 2500 resources
           }
