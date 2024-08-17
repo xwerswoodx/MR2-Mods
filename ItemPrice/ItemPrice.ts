@@ -37,27 +37,12 @@ export function load(MR2: MR2Globals) {
       const transmutationSpell = MR2.getTransmutationSpellForItem(this);
       if (transmutationSpell !== undefined) {
         let price = 0;
-        const { resources, items } = transmutationSpell.getCraftingMaterials(state);
-
-        let spellBonus = 0;
-        const buffSpell = MR2.Spells.getById("enchantTransmutation");
-        if (buffSpell !== undefined)
-        {
-          if (buffSpell.isActive(state))
-          {
-            let effect = buffSpell.getActionEffect(state, "magnitude");
-            spellBonus = (1 / (effect + 1));
-          }
-        }
+        const { resources, items } = transmutationSpell.getCraftingMaterialsBase(state);
 
         for (const [resource, amount] of Object.entries(resources)) {
           if (resource !== undefined) {
-            let newAmount = amount;
-            if (spellBonus > 0)
-              newAmount = amount / spellBonus; //Add the spellBonus % of the element as a default value.
-
-            price += (newAmount || 0) * getResourceValue(resource);
-            price += (newAmount || 0) / 2500; //Bonus price per 2500 resources
+            price += (amount || 0) * getResourceValue(resource);
+            price += (amount || 0) / 2500; //Bonus price per 2500 resources
           }
         }
   
